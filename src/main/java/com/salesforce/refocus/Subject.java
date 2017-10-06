@@ -1,4 +1,4 @@
-package refocus.pojo;
+package com.salesforce.refocus;
 
 import com.google.gson.Gson;
 

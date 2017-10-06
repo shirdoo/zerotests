@@ -1,4 +1,4 @@
-import refocus.RefocusClient;
+import com.salesforce.refocus.RefocusClient;
 
 /**
  * @author sbabu

@@ -1,8 +1,7 @@
-package refocus;
+package com.salesforce.refocus;
 
 import com.google.common.base.Preconditions;
 import com.squareup.okhttp.*;
-import refocus.pojo.Subject;
 
 import java.io.IOException;
 
@@ -59,7 +58,7 @@ public class RefocusClient {
         }
     }
 
-    private String executePut(String url, String body)  throws IOException {
+    private void executePut(String url, String body)  throws IOException {
         MediaType mediaType = MediaType.parse("application/json");
         Request request = new Request.Builder()
                 .url(url)
@@ -69,8 +68,7 @@ public class RefocusClient {
 
         Response r = client.newCall(request).execute();
         try (ResponseBody responseBody = r.body()) {
-            Preconditions.checkState(r.isSuccessful());
-            return responseBody.string().trim();
+            Preconditions.checkState(r.isSuccessful(), "Error executing POST against refocus: " + responseBody.string());
         }
     }
 
