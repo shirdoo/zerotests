@@ -36,6 +36,10 @@ public class Subject {
         return name;
     }
 
+    public String getDescription() {
+        return description;
+    }
+
     private static class Link {
         private final String name;
         private final String url;

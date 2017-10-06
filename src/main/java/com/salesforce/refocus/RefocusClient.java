@@ -28,8 +28,12 @@ public class RefocusClient {
         return Subject.fromJson(executeGet(String.format(SUBJECT_ENDPOINT + "/%s", urlEndpoint, subjectName)));
     }
 
-    public void postSubject(Subject subject) throws IOException {
-        executePut(String.format(SUBJECT_ENDPOINT, urlEndpoint), subject.toJson());
+    public void createSubject(Subject subject) throws IOException {
+        executePost(String.format(SUBJECT_ENDPOINT, urlEndpoint), subject.toJson());
+    }
+
+    public void updateSubject(Subject subject) throws IOException {
+        executePatch(String.format(SUBJECT_ENDPOINT + "/%s", urlEndpoint, subject.getName()), subject.toJson());
     }
 
     public void deleteSubject(String subjectName) throws Exception {
@@ -58,12 +62,26 @@ public class RefocusClient {
         }
     }
 
-    private void executePut(String url, String body)  throws IOException {
+    private void executePost(String url, String body)  throws IOException {
         MediaType mediaType = MediaType.parse("application/json");
         Request request = new Request.Builder()
                 .url(url)
                 .addHeader("Authorization", accessToken)
                 .post(RequestBody.create(mediaType, body))
+                .build();
+
+        Response r = client.newCall(request).execute();
+        try (ResponseBody responseBody = r.body()) {
+            Preconditions.checkState(r.isSuccessful(), "Error executing POST against refocus: " + responseBody.string());
+        }
+    }
+
+    private void executePatch(String url, String body) throws IOException {
+        MediaType mediaType = MediaType.parse("application/json");
+        Request request = new Request.Builder()
+                .url(url)
+                .addHeader("Authorization", accessToken)
+                .patch(RequestBody.create(mediaType, body))
                 .build();
 
         Response r = client.newCall(request).execute();

@@ -2,6 +2,7 @@ package com.salesforce.refocus;
 
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
@@ -15,10 +16,28 @@ public class RefocusClientTest {
     public void testSubjectCrud() throws Exception {
         RefocusClient client = new RefocusClient();
         String subjectName = "RefocusClientTest";
-        Subject s = Subject.SubjectBuilder.aSubject("RefocusClientTest").build();
+        Subject.SubjectBuilder builder = Subject.SubjectBuilder.aSubject("RefocusClientTest");
+        Subject s = builder.build();
         try {
-            client.postSubject(s);
-            assertNotNull(client.getSubject(s.getName()));
+
+            //create
+            client.createSubject(s);
+
+            //read
+            Subject refocusSubject = client.getSubject(s.getName());
+            assertNotNull(refocusSubject);
+            assertEquals(s.getName(), refocusSubject.getName());
+            assertNull(refocusSubject.getDescription());
+
+            //update
+            String newDescription = "Updated description";
+            client.updateSubject(builder.withDescription(newDescription).build());
+            refocusSubject = client.getSubject(s.getName());
+            assertNotNull(refocusSubject);
+            assertEquals(s.getName(), refocusSubject.getName());
+            assertEquals(newDescription, refocusSubject.getDescription());
+
+            //delete
             client.deleteSubject(s.getName());
             assertNull(client.getSubject(s.getName()));
         } finally {
