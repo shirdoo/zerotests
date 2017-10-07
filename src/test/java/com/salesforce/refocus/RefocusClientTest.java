@@ -2,9 +2,9 @@ package com.salesforce.refocus;
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import java.util.List;
+
+import static org.junit.Assert.*;
 
 /**
  * @author sbabu
@@ -16,10 +16,9 @@ public class RefocusClientTest {
     public void testSubjectCrud() throws Exception {
         RefocusClient client = new RefocusClient();
         String subjectName = "RefocusClientTest";
-        Subject.SubjectBuilder builder = Subject.SubjectBuilder.aSubject("RefocusClientTest");
+        Subject.SubjectBuilder builder = Subject.SubjectBuilder.aSubject("testSubjectCrud");
         Subject s = builder.build();
         try {
-
             //create
             client.createSubject(s);
 
@@ -45,9 +44,26 @@ public class RefocusClientTest {
         }
     }
 
+
+
     @Test
-    public void testGetAspect() throws Exception {
+    public void testAspectCrud() throws Exception {
         RefocusClient client = new RefocusClient();
+        Aspect.AspectBuilder aspectBuilder = Aspect.AspectBuilder.anAspect("testAspectCrud");
+        Aspect a = aspectBuilder.build();
+        try {
+            //create
+        client.createAspect(a);
+
+        //read
+            List<Aspect> refocusAspect = client.getAspect(a.getName());
+        assertNotNull(refocusAspect);
+        } finally {
+            try {
+                client.deleteAspect(a.getName());
+            } catch (IllegalStateException e) {
+            } // dont complain if delete fails, it should on the happy path
+        }
         assertNotNull(client.getAspect("IdGeneratorPing"));
     }
 }

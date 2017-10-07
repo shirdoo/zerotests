@@ -4,6 +4,7 @@ import com.google.common.base.Preconditions;
 import com.squareup.okhttp.*;
 
 import java.io.IOException;
+import java.util.List;
 
 /**
  * @author sbabu
@@ -40,8 +41,21 @@ public class RefocusClient {
         executeDelete(String.format(SUBJECT_ENDPOINT + "/%s", urlEndpoint, subjectName));
     }
 
-    public String getAspect(String aspectName) throws IOException {
-        return executeGet(String.format(ASPECT_ENDPOINT, urlEndpoint, aspectName));
+    public List<Aspect> getAspect(String aspectName) throws IOException {
+        String ret = executeGet(String.format(ASPECT_ENDPOINT, urlEndpoint, aspectName));
+        return Aspect.fromJson(ret);
+    }
+
+    public void createAspect(Aspect aspect) throws IOException {
+        executePost(String.format(ASPECT_ENDPOINT, urlEndpoint), aspect.toJson());
+    }
+
+    public void updateAspect(Aspect aspect) throws IOException {
+        executePatch(String.format(ASPECT_ENDPOINT + "/%s", urlEndpoint, aspect.getName()), aspect.toJson());
+    }
+
+    public void deleteAspect(String aspectName) throws IOException {
+        executeDelete(String.format(ASPECT_ENDPOINT + "/%s", urlEndpoint, aspectName));
     }
 
     private String executeGet(String url) throws IOException {
