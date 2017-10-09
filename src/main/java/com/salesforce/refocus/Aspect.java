@@ -1,11 +1,13 @@
 package com.salesforce.refocus;
 
 import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 
 import java.util.List;
 
 /**
+ * Simple pojo describing an aspect:
+ *   https://salesforce.github.io/refocus/docs/01-quickstart.html#aspect
+ *
  * @author sbabu
  * @since 10/6/17
  */
@@ -13,8 +15,8 @@ public class Aspect {
     private static final Gson GSON = new Gson();
 
 
-    public static List<Aspect> fromJson(String json) {
-        return GSON.fromJson(json, new TypeToken<List<Aspect>>(){}.getType());
+    public static Aspect fromJson(String json) {
+        return GSON.fromJson(json, Aspect.class);
     }
 
     public String toJson() {
@@ -38,6 +40,35 @@ public class Aspect {
     public String getName() {
         return name;
     }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public boolean isPublished() {
+        return isPublished;
+    }
+
+    public List<Integer> getCriticalRange() {
+        return criticalRange;
+    }
+
+    public String getTimeout() {
+        return timeout;
+    }
+
+    @Override
+    public String toString() {
+        return "Aspect{" +
+                "name='" + name + '\'' +
+                ", description='" + description + '\'' +
+                ", isPublished=" + isPublished +
+                ", criticalRange=" + criticalRange +
+                ", timeout='" + timeout + '\'' +
+                '}';
+    }
+
+
 
     public static final class AspectBuilder {
         private String name;
@@ -82,5 +113,31 @@ public class Aspect {
         public Aspect build() {
             return new Aspect(name, description, timeout, isPublished, criticalRange);
         }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Aspect aspect = (Aspect) o;
+
+        if (isPublished() != aspect.isPublished()) return false;
+        if (getName() != null ? !getName().equals(aspect.getName()) : aspect.getName() != null) return false;
+        if (getDescription() != null ? !getDescription().equals(aspect.getDescription()) : aspect.getDescription() != null)
+            return false;
+        if (getCriticalRange() != null ? !getCriticalRange().equals(aspect.getCriticalRange()) : aspect.getCriticalRange() != null)
+            return false;
+        return getTimeout() != null ? getTimeout().equals(aspect.getTimeout()) : aspect.getTimeout() == null;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = getName() != null ? getName().hashCode() : 0;
+        result = 31 * result + (getDescription() != null ? getDescription().hashCode() : 0);
+        result = 31 * result + (isPublished() ? 1 : 0);
+        result = 31 * result + (getCriticalRange() != null ? getCriticalRange().hashCode() : 0);
+        result = 31 * result + (getTimeout() != null ? getTimeout().hashCode() : 0);
+        return result;
     }
 }

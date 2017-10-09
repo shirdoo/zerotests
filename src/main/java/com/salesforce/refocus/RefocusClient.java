@@ -41,8 +41,8 @@ public class RefocusClient {
         executeDelete(String.format(SUBJECT_ENDPOINT + "/%s", urlEndpoint, subjectName));
     }
 
-    public List<Aspect> getAspect(String aspectName) throws IOException {
-        String ret = executeGet(String.format(ASPECT_ENDPOINT, urlEndpoint, aspectName));
+    public Aspect getAspect(String aspectName) throws IOException {
+        String ret = executeGet(String.format(ASPECT_ENDPOINT + "/%s", urlEndpoint, aspectName));
         return Aspect.fromJson(ret);
     }
 
