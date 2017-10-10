@@ -8,7 +8,7 @@ import java.lang.reflect.Type;
  * Currently supported config types of aspects as documented at:
  * https://salesforce.github.io/refocus/docs/01-quickstart.html#aspect
  */
-abstract class ValueType<T> {
+public abstract class ValueType<T> {
     public abstract String encode(T value);
 
     public abstract T decode(String encoding);
@@ -70,13 +70,13 @@ abstract class ValueType<T> {
         }
     }
 
-    static class ValueTypeSerializer implements JsonSerializer<ValueType> {
+    public static class ValueTypeSerializer implements JsonSerializer<ValueType> {
         public JsonElement serialize(ValueType src, Type typeOfSrc, JsonSerializationContext context) {
             return new JsonPrimitive(src.toString());
         }
     }
 
-    static class ValueTypeDeserializer implements JsonDeserializer<ValueType> {
+    public static class ValueTypeDeserializer implements JsonDeserializer<ValueType> {
         public ValueType deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context)
                 throws JsonParseException {
             switch(json.getAsJsonPrimitive().getAsString()) {

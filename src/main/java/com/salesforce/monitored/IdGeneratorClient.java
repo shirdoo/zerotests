@@ -22,6 +22,10 @@ public class IdGeneratorClient {
         Preconditions.checkNotNull(idServiceUrl, "Missing required id generator endpoint on environment var ID_GENERATOR_URL");
     }
 
+    public String getUrl() {
+        return idServiceUrl;
+    }
+
     public String getKey(String orgId, String keyPrefix) throws IOException {
         Request request = new Request.Builder()
                 .url(String.format(ID_SERVICE_ENDPOINT, idServiceUrl, orgId, keyPrefix))

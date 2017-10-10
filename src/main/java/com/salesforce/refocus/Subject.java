@@ -117,11 +117,6 @@ public class Subject {
 
     @Override
     public String toString() {
-        return "Subject{" +
-                "name='" + name + '\'' +
-                ", description='" + description + '\'' +
-                ", isPublished=" + isPublished +
-                ", relatedLinks=" + relatedLinks +
-                '}';
+        return GSON.toJson(this);
     }
 }

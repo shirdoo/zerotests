@@ -82,7 +82,7 @@ public class RefocusClientTest {
         RefocusClient client = new RefocusClient();
         System.out.println(client.getAspects().get(0));
         System.out.println(client.getSubjects().get(0));
-        Sample sample = new Sample("IdGenerator", "IdGeneratorPing", "true");
+        Sample sample = new Sample("IdGenerator", "IdGeneratorPing", "true", "test sample");
         client.postSamples(ImmutableSet.of(sample));
     }
 }

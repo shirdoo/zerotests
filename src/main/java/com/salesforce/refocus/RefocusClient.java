@@ -1,14 +1,14 @@
 package com.salesforce.refocus;
 
 import com.google.common.base.Preconditions;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import com.squareup.okhttp.*;
 
 import java.io.IOException;
 import java.util.List;
 import java.util.Set;
+
+import static com.salesforce.GsonUtils.GSON;
 
 /**
  * @author sbabu
@@ -18,13 +18,7 @@ public class RefocusClient {
     private static final String SUBJECT_ENDPOINT= "%s/v1/subjects";
     private static final String ASPECT_ENDPOINT = "%s/v1/aspects";
     private static final String SAMPLE_ENDPOINT = "%s/v1/samples/upsert/bulk";
-    private static final Gson GSON;
-    static {
-        GsonBuilder gson = new GsonBuilder();
-        gson.registerTypeAdapter(ValueType.class, new ValueType.ValueTypeSerializer());
-        gson.registerTypeAdapter(ValueType.class, new ValueType.ValueTypeDeserializer());
-        GSON = gson.create();
-    }
+
 
     private final String urlEndpoint;
     private final String accessToken;
@@ -97,8 +91,9 @@ public class RefocusClient {
             if (!r.isSuccessful() && r.code() == 404) {
                 return null; // refocus returns 404 for subjects not in DB
             } else {
-                Preconditions.checkState(r.isSuccessful(), r.body() + r.toString());
-                return body.string().trim();
+                String respBody = body.string();
+                Preconditions.checkState(r.isSuccessful(), respBody);
+                return respBody.trim();
             }
         }
     }
@@ -111,6 +106,7 @@ public class RefocusClient {
                 .post(RequestBody.create(mediaType, body))
                 .build();
 
+        System.out.println(String.format("Running POST against %s with body %s", url, body));
         Response r = client.newCall(request).execute();
         try (ResponseBody responseBody = r.body()) {
             Preconditions.checkState(r.isSuccessful(), "Error executing POST against refocus: " + responseBody.string());
@@ -126,7 +122,9 @@ public class RefocusClient {
                 .build();
 
         Response r = client.newCall(request).execute();
-        Preconditions.checkState(r.isSuccessful(), "Error executing POST against refocus: " + r.message());
+        try (ResponseBody responseBody = r.body()) {
+            Preconditions.checkState(r.isSuccessful(), "Error executing POST against refocus: " + responseBody.string());
+        }
     }
 
     private String executeDelete(String url) throws IOException {
@@ -138,8 +136,9 @@ public class RefocusClient {
 
         Response r = client.newCall(request).execute();
         try (ResponseBody body = r.body()) {
-            Preconditions.checkState(r.isSuccessful());
-            return body.string().trim();
+            String respBody = body.string();
+            Preconditions.checkState(r.isSuccessful(), respBody);
+            return respBody.trim();
         }
     }
 

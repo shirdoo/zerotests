@@ -1,0 +1,13 @@
+[
+  {
+    "description": "Simple app supplying unique ids given an orgId and key prefix",
+    "isPublished": true,
+    "name": "IdGenerator",
+    "relatedLinks": [
+      {
+        "name": "ID_GENERATOR_URL",
+        "url": "http://sfdc-id-generator.herokuapp.com/"
+      }
+    ]
+  }
+]
