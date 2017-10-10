@@ -1,6 +1,6 @@
 package com.salesforce.refocus;
 
-import com.google.gson.Gson;
+import com.google.common.base.Preconditions;
 
 import java.util.List;
 
@@ -11,30 +11,22 @@ import java.util.List;
  * @author sbabu
  * @since 10/6/17
  */
-public class Aspect {
-    private static final Gson GSON = new Gson();
-
-
-    public static Aspect fromJson(String json) {
-        return GSON.fromJson(json, Aspect.class);
-    }
-
-    public String toJson() {
-        return GSON.toJson(this);
-    }
+public class Aspect<T> {
 
     private final String name;
     private final String description;
     private final boolean isPublished;
     private final List<Integer> criticalRange;
     private final String timeout;
+    private final ValueType valueType;
 
-    private Aspect(String name, String description, String timeout, boolean isPublished, List<Integer> criticalRange) {
+    private Aspect(String name, String description, String timeout, boolean isPublished, List<Integer> criticalRange, ValueType<T> valueType) {
         this.name = name;
         this.description = description;
         this.isPublished = isPublished;
         this.criticalRange = criticalRange;
         this.timeout = timeout;
+        this.valueType = valueType;
     }
 
     public String getName() {
@@ -57,6 +49,10 @@ public class Aspect {
         return timeout;
     }
 
+    public ValueType getValueType() {
+        return valueType;
+    }
+
     @Override
     public String toString() {
         return "Aspect{" +
@@ -65,17 +61,17 @@ public class Aspect {
                 ", isPublished=" + isPublished +
                 ", criticalRange=" + criticalRange +
                 ", timeout='" + timeout + '\'' +
+                ", valueType='" + valueType + '\'' +
                 '}';
     }
-
-
 
     public static final class AspectBuilder {
         private String name;
         private String description;
         private boolean isPublished = true;
         private List<Integer> criticalRange;
-        private String timeout = "20s";
+        private String timeout = "60m";
+        private ValueType valueType = ValueType.NumericType.NUMERIC;
 
         private AspectBuilder(String name) {
             this.name = name;
@@ -100,7 +96,15 @@ public class Aspect {
             return this;
         }
 
+        public AspectBuilder withValueType(ValueType valueType) {
+            this.valueType = valueType;
+            return this;
+        }
+
         public AspectBuilder withCriticalRange(List<Integer> criticalRange) {
+            Preconditions.checkArgument(criticalRange != null, "Missing critical range arg");
+            Preconditions.checkArgument(criticalRange.size() == 2, "Critical range list must contain 2 elements, a min and max");
+            Preconditions.checkArgument(criticalRange.get(0) < criticalRange.get(1), "Min should be less than max");
             this.criticalRange = criticalRange;
             return this;
         }
@@ -111,7 +115,7 @@ public class Aspect {
         }
 
         public Aspect build() {
-            return new Aspect(name, description, timeout, isPublished, criticalRange);
+            return new Aspect(name, description, timeout, isPublished, criticalRange, valueType);
         }
     }
 
@@ -124,6 +128,7 @@ public class Aspect {
 
         if (isPublished() != aspect.isPublished()) return false;
         if (getName() != null ? !getName().equals(aspect.getName()) : aspect.getName() != null) return false;
+        if (getValueType() != null ? !getValueType().equals(aspect.getValueType()) : aspect.getValueType() != null) return false;
         if (getDescription() != null ? !getDescription().equals(aspect.getDescription()) : aspect.getDescription() != null)
             return false;
         if (getCriticalRange() != null ? !getCriticalRange().equals(aspect.getCriticalRange()) : aspect.getCriticalRange() != null)

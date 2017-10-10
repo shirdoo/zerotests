@@ -10,3 +10,5 @@ Setup required environment variables:
  
  Once the environment is set, running all tests is a simple `mvn install` 
  
+ 
+ If starting from a fresh DB, you want to initialize the UI by pushing the latest MultiTable, see directions in the refocus [docs](https://salesforce.github.io/refocus/docs/01-quickstart.html#step-4-install-a-lens)

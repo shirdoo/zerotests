@@ -6,18 +6,12 @@ import com.google.gson.Gson;
 import java.util.List;
 
 /**
+ * Simple java pojo representing a Sample:
+ *   https://salesforce.github.io/refocus/docs/01-quickstart.html#subject
  * @author sbabu
  * @since 10/5/17
  */
 public class Subject {
-
-    public static Subject fromJson(String json) {
-        return GSON.fromJson(json, Subject.class);
-    }
-
-    public String toJson() {
-        return GSON.toJson(this);
-    }
 
     private Subject(String name, String description, boolean isPublished, List<Link> relatedLinks) {
         this.description = description;

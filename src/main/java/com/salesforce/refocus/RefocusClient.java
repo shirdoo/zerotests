@@ -1,10 +1,14 @@
 package com.salesforce.refocus;
 
 import com.google.common.base.Preconditions;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
 import com.squareup.okhttp.*;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author sbabu
@@ -13,6 +17,14 @@ import java.util.List;
 public class RefocusClient {
     private static final String SUBJECT_ENDPOINT= "%s/v1/subjects";
     private static final String ASPECT_ENDPOINT = "%s/v1/aspects";
+    private static final String SAMPLE_ENDPOINT = "%s/v1/samples/upsert/bulk";
+    private static final Gson GSON;
+    static {
+        GsonBuilder gson = new GsonBuilder();
+        gson.registerTypeAdapter(ValueType.class, new ValueType.ValueTypeSerializer());
+        gson.registerTypeAdapter(ValueType.class, new ValueType.ValueTypeDeserializer());
+        GSON = gson.create();
+    }
 
     private final String urlEndpoint;
     private final String accessToken;
@@ -26,36 +38,51 @@ public class RefocusClient {
     }
 
     public Subject getSubject(String subjectName) throws IOException {
-        return Subject.fromJson(executeGet(String.format(SUBJECT_ENDPOINT + "/%s", urlEndpoint, subjectName)));
+        String json = executeGet(String.format(SUBJECT_ENDPOINT + "/%s", urlEndpoint, subjectName));
+        return GSON.fromJson(json, Subject.class);
+    }
+
+    public List<Subject> getSubjects() throws IOException {
+        String json = executeGet(String.format(SUBJECT_ENDPOINT, urlEndpoint));
+        return GSON.fromJson(json, new TypeToken<List<Subject>>(){}.getType());
     }
 
     public void createSubject(Subject subject) throws IOException {
-        executePost(String.format(SUBJECT_ENDPOINT, urlEndpoint), subject.toJson());
+        executePost(String.format(SUBJECT_ENDPOINT, urlEndpoint), GSON.toJson(subject));
     }
 
     public void updateSubject(Subject subject) throws IOException {
-        executePatch(String.format(SUBJECT_ENDPOINT + "/%s", urlEndpoint, subject.getName()), subject.toJson());
+        executePatch(String.format(SUBJECT_ENDPOINT + "/%s", urlEndpoint, subject.getName()), GSON.toJson(subject));
     }
 
     public void deleteSubject(String subjectName) throws Exception {
         executeDelete(String.format(SUBJECT_ENDPOINT + "/%s", urlEndpoint, subjectName));
     }
 
+    public List<Aspect> getAspects() throws IOException {
+        String jsonResponse = executeGet(String.format(ASPECT_ENDPOINT, urlEndpoint));
+        return GSON.fromJson(jsonResponse, new TypeToken<List<Aspect>>(){}.getType());
+    }
+
     public Aspect getAspect(String aspectName) throws IOException {
-        String ret = executeGet(String.format(ASPECT_ENDPOINT + "/%s", urlEndpoint, aspectName));
-        return Aspect.fromJson(ret);
+        String json = executeGet(String.format(ASPECT_ENDPOINT + "/%s", urlEndpoint, aspectName));
+        return GSON.fromJson(json, Aspect.class);
     }
 
     public void createAspect(Aspect aspect) throws IOException {
-        executePost(String.format(ASPECT_ENDPOINT, urlEndpoint), aspect.toJson());
+        executePost(String.format(ASPECT_ENDPOINT, urlEndpoint), GSON.toJson(aspect));
     }
 
     public void updateAspect(Aspect aspect) throws IOException {
-        executePatch(String.format(ASPECT_ENDPOINT + "/%s", urlEndpoint, aspect.getName()), aspect.toJson());
+        executePatch(String.format(ASPECT_ENDPOINT + "/%s", urlEndpoint, aspect.getName()), GSON.toJson(aspect));
     }
 
     public void deleteAspect(String aspectName) throws IOException {
         executeDelete(String.format(ASPECT_ENDPOINT + "/%s", urlEndpoint, aspectName));
+    }
+
+    public void postSamples(Set<Sample> samples) throws IOException {
+        executePost(String.format(SAMPLE_ENDPOINT, urlEndpoint), GSON.toJson(samples));
     }
 
     private String executeGet(String url) throws IOException {
@@ -99,9 +126,7 @@ public class RefocusClient {
                 .build();
 
         Response r = client.newCall(request).execute();
-        try (ResponseBody responseBody = r.body()) {
-            Preconditions.checkState(r.isSuccessful(), "Error executing POST against refocus: " + responseBody.string());
-        }
+        Preconditions.checkState(r.isSuccessful(), "Error executing POST against refocus: " + r.message());
     }
 
     private String executeDelete(String url) throws IOException {

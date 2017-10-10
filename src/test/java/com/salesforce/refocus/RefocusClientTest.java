@@ -1,6 +1,7 @@
 package com.salesforce.refocus;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
@@ -74,5 +75,14 @@ public class RefocusClientTest {
             } catch (IllegalStateException e) {
             } // dont complain if delete fails, it should on the happy path
         }
+    }
+
+    @Test
+    public void testSamplePost() throws Exception {
+        RefocusClient client = new RefocusClient();
+        System.out.println(client.getAspects().get(0));
+        System.out.println(client.getSubjects().get(0));
+        Sample sample = new Sample("IdGenerator", "IdGeneratorPing", "true");
+        client.postSamples(ImmutableSet.of(sample));
     }
 }
